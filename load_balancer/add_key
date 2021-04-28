@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Checks if holberton key exists. If not it's added to the auth_keys file
+if grep "P0MdCLgwkN$" ~/.ssh/authorized_keys
+then
+    :
+else
+    cat ~/scripts_conf/key_file >> ~/.ssh/authorized_keys
+fi

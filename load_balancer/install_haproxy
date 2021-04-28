@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Configure HAProxy on the Load balancer
+WEB_01="$1"
+WEB_02="$2"
+
+apt-get update
+apt-get install -y haproxy=1.6.\*
+
+if grep "balance roundrobin" /etc/haproxy/haproxy.cf
+then
+    :
+else
+    echo -e '\nbackend web-backend\n\tbalance roundrobin\n\tserver web1 "$1":80 check\n\tserver web2 "$2":80 check\n' >> /etc/haproxy/haproxy.cfg
+fi
+
+if grep "default_backend" /etc/haproxy/haproxy.cfg
+then
+    :
+else
+    echo -e '\nfrontend http\n\tbind *:80\n\tmode http\n\tdefault_backend web-backend\n' >> /etc/haproxy/haproxy.cfg
+fi
+
+service haproxy restart

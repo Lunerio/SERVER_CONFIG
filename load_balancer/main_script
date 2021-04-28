@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Uploads necessary files to load balancer server and configures everything
+WEB_01="$1"
+WEB_02="$2"
+LOAD_IP="$4"
+KEY="$3"
+
+if [[ $# -ne 4 ]]
+then
+    echo "Usage: ./main_script <web-01 ip> <web-02 ip> <path_to_pub_key> <load_balancer ip>"
+else
+    # Create files folder in server
+    ssh -i "$KEY" ubuntu@"$LOAD_IP" 'mkdir ~/scripts_conf'
+
+    # Copy key_file and add_key. Execute add_key
+    scp -i "$KEY" -o StrictHostKeyChecking=no ./key_file ubuntu@"$LOAD_IP":~/scripts_conf
+    scp -i "$KEY" -o StrictHostKeyChecking=no ./add_key ubuntu@"$LOAD_IP":~/scripts_conf
+    ssh -i "$KEY" ubuntu@"$LOAD_IP" 'sudo ~/scripts_conf/add_key'
+
+    # Copy install_haproxy script and execute it
+    scp -i "$KEY" -o StrictHostKeyChecking=no ./install_haproxy ubuntu@"$LOAD_IP":~/scripts_conf
+    ssh -i "$KEY" ubuntu@"$LOAD_IP" 'sudo ~/scripts_conf/install_haproxy \"$1\" \"$2\"' 
+fi
+
+ssh -i "$KEY" ubuntu@"$LOAD_IP" 'rm -rf scripts_conf' 
