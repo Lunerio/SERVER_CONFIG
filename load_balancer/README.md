@@ -9,3 +9,4 @@
 - This creates a folder in the home directory with some files, but after running it will be deleted.
 
 This script won't break a working load balancer server
+DO THE FIREWALL CONFIGURATION MANUALLY. CHECK THE PORTS BEFORE LEAVING THE SERVERS!

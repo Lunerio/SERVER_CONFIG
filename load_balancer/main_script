@@ -19,6 +19,7 @@ else
 
     # Execute install_haproxy on server
     ssh -i "$KEY" ubuntu@"$LOAD_IP" 'sudo bash -s' < ./install_haproxy $1 $2
+    
 fi
 
 ssh -i "$KEY" ubuntu@"$LOAD_IP" 'rm -rf scripts_conf' 

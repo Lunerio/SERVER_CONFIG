@@ -8,3 +8,4 @@ This script does the following:
 - For the SSL certificate follow the instructions in this [link](https://www.digitalocean.com/community/tutorials/how-to-secure-haproxy-with-let-s-encrypt-on-ubuntu-14-04)
 
 For more information go to the README from the load_balancer folder
+DO THE FIREWALL CONFIGURATION MANUALLY. CHECK THE PORTS BEFORE LEAVING THE SERVERS!
