@@ -6,11 +6,16 @@ WEB_02="$2"
 apt-get update
 apt-get install -y haproxy=1.6.\*
 
-if grep "balance roundrobin" /etc/haproxy/haproxy.cf
+if grep "balance roundrobin" /etc/haproxy/haproxy.cfg
 then
     :
 else
-    echo -e '\nbackend web-backend\n\tbalance roundrobin\n\tserver web1 "$1":80 check\n\tserver web2 "$2":80 check\n' >> /etc/haproxy/haproxy.cfg
+    echo "
+backend web-backend
+    balance roundrobin
+    server web1 $1:80 check
+    server web2 $2:80 check
+" >> /etc/haproxy/haproxy.cfg
 fi
 
 if grep "default_backend" /etc/haproxy/haproxy.cfg

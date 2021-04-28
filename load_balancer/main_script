@@ -17,9 +17,8 @@ else
     scp -i "$KEY" -o StrictHostKeyChecking=no ./add_key ubuntu@"$LOAD_IP":~/scripts_conf
     ssh -i "$KEY" ubuntu@"$LOAD_IP" 'sudo ~/scripts_conf/add_key'
 
-    # Copy install_haproxy script and execute it
-    scp -i "$KEY" -o StrictHostKeyChecking=no ./install_haproxy ubuntu@"$LOAD_IP":~/scripts_conf
-    ssh -i "$KEY" ubuntu@"$LOAD_IP" 'sudo ~/scripts_conf/install_haproxy \"$1\" \"$2\"' 
+    # Execute install_haproxy on server
+    ssh -i "$KEY" ubuntu@"$LOAD_IP" 'sudo bash -s' < ./install_haproxy $1 $2
 fi
 
 ssh -i "$KEY" ubuntu@"$LOAD_IP" 'rm -rf scripts_conf' 
