@@ -8,5 +8,5 @@
 - Don't run any other script from here because they will run locally.
 - This creates a folder in the home directory with some files, but after running it will be deleted.
 
-This script won't break a working load balancer server
-DO THE FIREWALL CONFIGURATION MANUALLY. CHECK THE PORTS BEFORE LEAVING THE SERVERS!
+* This script won't break a working load balancer server
+* DO THE FIREWALL CONFIGURATION MANUALLY. CHECK THE PORTS BEFORE LEAVING THE SERVERS!
