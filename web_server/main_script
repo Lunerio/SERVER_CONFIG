@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Configures the web-01 and web-02 servers
+# Deploys necessary files and installs nginx
+
+WEB1_IP="$1"
+WEB2_IP="$2"
+KEY="$3"
+
+if [[ $# -ne 3 ]]
+then
+    echo "Usage: ./main_script <web-01 ip> <web-02 ip> <path_to_pub_key>"
+else
+    # Create temp folder on servers
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'mkdir ~/scripts_conf'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'mkdir ~/scripts_conf'
+    # Copy key_file and add_key. Execute add_key
+    scp -i "$KEY" -o StrictHostKeyChecking=no ./key_file ubuntu@"$WEB1_IP":~/scripts_conf
+    scp -i "$KEY" -o StrictHostKeyChecking=no ./key_file ubuntu@"$WEB2_IP":~/scripts_conf
+
+    scp -i "$KEY" -o StrictHostKeyChecking=no ./add_key ubuntu@"$WEB1_IP":~/scripts_conf
+    scp -i "$KEY" -o StrictHostKeyChecking=no ./add_key ubuntu@"$WEB2_IP":~/scripts_conf
+
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'sudo ~/scripts_conf/add_key'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'sudo ~/scripts_conf/add_key'
+
+    # Install nginx
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'sudo apt-get update'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'sudo apt-get update'
+
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'sudo apt-get install -y nginx'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'sudo apt-get install -y nginx'
+
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'sudo ufw allow "Nginx HTTP"'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'sudo ufw allow "Nginx HTTP"'
+
+    # Add config file and replace the original one
+    scp -i "$KEY" -o StrictHostKeyChecking=no ./nginx_config_default ubuntu@"$WEB1_IP":~/scripts_conf
+    scp -i "$KEY" -o StrictHostKeyChecking=no ./nginx_config_default ubuntu@"$WEB2_IP":~/scripts_conf
+            
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'cat ~/scripts_conf/nginx_config_default | sudo tee /etc/nginx/sites-available/default'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'cat ~/scripts_conf/nginx_config_default | sudo tee /etc/nginx/sites-available/default'
+
+    # Add new html files
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'sudo chown -R "$USER":"$USER" /var/www/'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'sudo chown -R "$USER":"$USER" /var/www/'
+    
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'echo "Holberton School" | sudo tee /var/www/html/index.nginx-debian.html'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'echo "Holberton School" | sudo tee /var/www/html/index.nginx-debian.html'
+
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'echo "Ceci n'\''est pas une page" | sudo tee /var/www/html/new_404.html'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'echo "Ceci n'\''est pas une page" | sudo tee /var/www/html/new_404.html'
+
+    # Deploy web static with fabric
+
+    # First create the needed folders and files
+    scp -i "$KEY" -o StrictHostKeyChecking=no ./set_folder_static ubuntu@"$WEB1_IP":~/scripts_conf
+    scp -i "$KEY" -o StrictHostKeyChecking=no ./set_folder_static ubuntu@"$WEB2_IP":~/scripts_conf
+
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'sudo ~/scripts_conf/set_folder_static'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'sudo ~/scripts_conf/set_folder_static'
+    
+    # Deploy the new files with fabric scripts
+    fab -f 3-deploy_web_static.py deploy -i "$KEY" -u ubuntu
+
+    # Restart nginx
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'sudo service nginx restart'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'sudo service nginx restart'
+
+    ssh -i "$KEY" ubuntu@"$WEB1_IP" 'rm -rf ~/scripts_conf'
+    ssh -i "$KEY" ubuntu@"$WEB2_IP" 'rm -rf ~/scripts_conf'
+fi
+
