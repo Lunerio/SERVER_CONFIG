@@ -9,6 +9,8 @@ if [[ $# -ne 4 ]]
 then
     echo "Usage: ./main_script <web-01 ip> <web-02 ip> <path_to_pub_key> <load_balancer ip>"
 else
+    clear
+    cat ./intro
     # Create files folder in server
     ssh -i "$KEY" ubuntu@"$LOAD_IP" 'mkdir ~/scripts_conf'
 
