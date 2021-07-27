@@ -1,0 +1,31 @@
+#!/bin/bash
+# coso
+IP1=$1
+IP2=$2
+
+if grep 35.196.163.39 2-do_deploy_web_static.py
+then
+    sed -i s/'35.196.163.39'/$IP1/ 2-do_deploy_web_static.py
+else
+    :
+fi
+if grep 35.185.33.80 2-do_deploy_web_static.py
+then
+    sed -i s/'35.185.33.80'/$IP2/ 2-do_deploy_web_static.py
+else
+    :
+fi
+
+
+if grep 35.196.163.39 3-deploy_web_static.py
+then
+    sed -i s/'35.196.163.39'/$IP1/ 3-deploy_web_static.py
+else
+    :
+fi
+if grep 35.185.33.80 3-deploy_web_static.py
+then
+    sed -i s/'35.185.33.80'/$IP2/ 3-deploy_web_static.py
+else
+    :
+fi

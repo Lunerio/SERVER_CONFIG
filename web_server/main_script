@@ -12,6 +12,8 @@ then
 else
     clear
     cat ./intro
+    # Edit python scripts with proper IP's
+    ./change_ip_python $WEB1_IP $WEB2_IP
     # Create temp folder on servers
     ssh -i "$KEY" ubuntu@"$WEB1_IP" 'mkdir ~/scripts_conf'
     ssh -i "$KEY" ubuntu@"$WEB2_IP" 'mkdir ~/scripts_conf'
